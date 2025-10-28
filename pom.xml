@@ -70,6 +70,7 @@
     <maven.gpg.plugin.version>3.2.8</maven.gpg.plugin.version>
     <central.publishing.plugin.version>0.9.0</central.publishing.plugin.version>
     <maven.release.plugin.version>3.1.1</maven.release.plugin.version>
+    <jacoco.version>0.8.12</jacoco.version>
   </properties>
 
   <dependencyManagement>
@@ -179,6 +180,25 @@
           <goals>deploy</goals>
           <preparationGoals>clean compile</preparationGoals>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
