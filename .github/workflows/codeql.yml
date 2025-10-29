@@ -1,5 +1,8 @@
 name: CodeQL
 
+env:
+  CODEQL_ACTION_DISABLE_DEFAULT_SETUP: true
+
 on:
   push:
     branches: [main, master, develop]
