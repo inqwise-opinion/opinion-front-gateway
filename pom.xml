@@ -12,10 +12,9 @@
   </parent>
 
   <artifactId>opinion-front-gateway</artifactId>
-  <version>${revision}${changelist}</version>
+  <version>1.0.0-SNAPSHOT</version>
   <name>Opinion Front Gateway</name>
-  <description
-  >API gateway serving the Opinion Front account experience.</description>
+  <description>API gateway serving the Opinion Front account experience.</description>
   <url>https://github.com/inqwise-opinion/opinion-front-gateway</url>
 
   <organization>
@@ -41,10 +40,8 @@
   </developers>
 
   <scm>
-    <connection
-    >scm:git:https://github.com/inqwise-opinion/opinion-front-gateway.git</connection>
-    <developerConnection
-    >scm:git:https://github.com/inqwise-opinion/opinion-front-gateway.git</developerConnection>
+    <connection>scm:git:https://github.com/inqwise-opinion/opinion-front-gateway.git</connection>
+    <developerConnection>scm:git:https://github.com/inqwise-opinion/opinion-front-gateway.git</developerConnection>
     <url>https://github.com/inqwise-opinion/opinion-front-gateway</url>
     <tag>HEAD</tag>
   </scm>
@@ -63,13 +60,16 @@
   </distributionManagement>
 
   <properties>
-    <revision>1.0.0</revision>
-    <changelist>-SNAPSHOT</changelist>
-    <main.verticle
-    >com.inqwise.opinion.front.gateway.MainVerticle</main.verticle>
-    <launcher.class
-    >io.vertx.launcher.application.VertxApplication</launcher.class>
+    <exec-maven-plugin.version>3.6.2</exec-maven-plugin.version>
+    <main.verticle>com.inqwise.opinion.front.gateway.MainVerticle</main.verticle>
+    <launcher.class>io.vertx.launcher.application.VertxApplication</launcher.class>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.source.plugin.version>3.3.1</maven.source.plugin.version>
+    <maven.javadoc.plugin.version>3.12.0</maven.javadoc.plugin.version>
+    <maven.gpg.plugin.version>3.2.8</maven.gpg.plugin.version>
     <central.publishing.plugin.version>0.9.0</central.publishing.plugin.version>
+    <maven.release.plugin.version>3.1.1</maven.release.plugin.version>
     <jacoco.version>0.8.14</jacoco.version>
   </properties>
 
@@ -78,7 +78,7 @@
       <dependency>
         <groupId>com.inqwise.opinion</groupId>
         <artifactId>opinion-dependencies</artifactId>
-        <version>${revision}${changelist}</version>
+        <version>1.0.0-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -132,6 +132,56 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>${exec-maven-plugin.version}</version>
+        <configuration>
+          <mainClass>${launcher.class}</mainClass>
+          <arguments>
+            <argument>${main.verticle}</argument>
+          </arguments>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>${maven.source.plugin.version}</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${maven.javadoc.plugin.version}</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>${maven.release.plugin.version}</version>
+        <configuration>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <useReleaseProfile>false</useReleaseProfile>
+          <releaseProfiles>sonatype-oss-release</releaseProfiles>
+          <tagNameFormat>v@{project.version}</tagNameFormat>
+          <goals>deploy</goals>
+          <preparationGoals>clean compile</preparationGoals>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>${jacoco.version}</version>
@@ -155,72 +205,40 @@
 
   <profiles>
     <profile>
-      <id>snapshot-artifacts</id>
-      <activation>
-        <property>
-          <name>changelist</name>
-          <value>-SNAPSHOT</value>
-        </property>
-      </activation>
-      <repositories>
-        <repository>
-          <id>central-snapshots</id>
-          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-          <releases>
-            <enabled>false</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </repository>
-      </repositories>
-      <pluginRepositories>
-        <pluginRepository>
-          <id>central-snapshots</id>
-          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-          <releases>
-            <enabled>false</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </pluginRepository>
-      </pluginRepositories>
-    </profile>
-
-    <profile>
-      <id>release-quality</id>
-      <activation>
-        <property>
-          <name>changelist</name>
-          <value></value>
-        </property>
-      </activation>
+      <id>sonatype-oss-release</id>
       <build>
         <plugins>
           <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>${central.publishing.plugin.version}</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>sonatype-oss-release</publishingServerId>
+              <autoPublish>true</autoPublish>
+              <waitUntil>published</waitUntil>
+              <checksums>required</checksums>
+            </configuration>
+          </plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <version>3.4.1</version>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>${maven.gpg.plugin.version}</version>
             <executions>
               <execution>
-                <id>ban-snapshot-dependencies</id>
-                <phase>validate</phase>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
                 <goals>
-                  <goal>enforce</goal>
+                  <goal>sign</goal>
                 </goals>
-                <configuration>
-                  <rules>
-                    <requireReleaseDeps>
-                      <failWhenDependencyIsSnapshot>true</failWhenDependencyIsSnapshot>
-                      <failWhenParentIsSnapshot>true</failWhenParentIsSnapshot>
-                      <failWhenPluginIsSnapshot>true</failWhenPluginIsSnapshot>
-                      <failWhenProjectIsSnapshot>true</failWhenProjectIsSnapshot>
-                    </requireReleaseDeps>
-                  </rules>
-                </configuration>
               </execution>
             </executions>
+            <configuration>
+              <gpgArguments>
+                <arg>--pinentry-mode</arg>
+                <arg>loopback</arg>
+              </gpgArguments>
+            </configuration>
           </plugin>
         </plugins>
       </build>
