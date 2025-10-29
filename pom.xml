@@ -12,7 +12,7 @@
   </parent>
 
   <artifactId>opinion-front-gateway</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>${revision}${changelist}</version>
   <name>Opinion Front Gateway</name>
   <description
   >API gateway serving the Opinion Front account experience.</description>
@@ -63,6 +63,8 @@
   </distributionManagement>
 
   <properties>
+    <revision>1.0.0</revision>
+    <changelist>-SNAPSHOT</changelist>
     <main.verticle
     >com.inqwise.opinion.front.gateway.MainVerticle</main.verticle>
     <launcher.class
@@ -71,38 +73,12 @@
     <jacoco.version>0.8.14</jacoco.version>
   </properties>
 
-  <repositories>
-    <repository>
-      <id>central-snapshots</id>
-      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>central-snapshots</id>
-      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>com.inqwise.opinion</groupId>
         <artifactId>opinion-dependencies</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>${revision}${changelist}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -176,4 +152,78 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>snapshot-artifacts</id>
+      <activation>
+        <property>
+          <name>changelist</name>
+          <value>-SNAPSHOT</value>
+        </property>
+      </activation>
+      <repositories>
+        <repository>
+          <id>central-snapshots</id>
+          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central-snapshots</id>
+          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+
+    <profile>
+      <id>release-quality</id>
+      <activation>
+        <property>
+          <name>changelist</name>
+          <value></value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <version>3.4.1</version>
+            <executions>
+              <execution>
+                <id>ban-snapshot-dependencies</id>
+                <phase>validate</phase>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <requireReleaseDeps>
+                      <failWhenDependencyIsSnapshot>true</failWhenDependencyIsSnapshot>
+                      <failWhenParentIsSnapshot>true</failWhenParentIsSnapshot>
+                      <failWhenPluginIsSnapshot>true</failWhenPluginIsSnapshot>
+                      <failWhenProjectIsSnapshot>true</failWhenProjectIsSnapshot>
+                    </requireReleaseDeps>
+                  </rules>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
