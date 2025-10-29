@@ -14,7 +14,7 @@ jobs:
   release:
     name: Release to Maven Central
     runs-on: ubuntu-latest
-    if: github.repository == 'inqwise/opinion-front-gateway'
+    if: github.repository == 'inqwise-opinion/opinion-front-gateway'
 
     steps:
       - name: Checkout code
@@ -131,7 +131,7 @@ jobs:
 
             ## 🔗 Links
             - [Maven Central](https://central.sonatype.com/artifact/com.inqwise.opinion/opinion-front-gateway/${{ github.event.inputs.version }})
-            - [Documentation](https://github.com/inqwise/opinion-front-gateway#readme)
+            - [Documentation](https://github.com/inqwise-opinion/opinion-front-gateway#readme)
 
             ---
             *Released automatically via GitHub Actions*
