@@ -66,6 +66,10 @@ jobs:
             VERSION_INPUT="${{ github.ref_name }}"
             VERSION_INPUT="${VERSION_INPUT#v}"
           fi
+          if [[ "$VERSION_INPUT" == *-SNAPSHOT ]]; then
+            echo "::error ::Refusing to deploy snapshot version $VERSION_INPUT via release workflow."
+            exit 1
+          fi
           git checkout -f "v${VERSION_INPUT}"
           mvn clean deploy -P sonatype-oss-release -DskipTests -DreleaseVersion="$VERSION_INPUT"
         env:
